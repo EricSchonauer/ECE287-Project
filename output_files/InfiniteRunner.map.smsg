@@ -1,0 +1,4 @@
+Warning (10268): Verilog HDL information at InfiniteRunner.v(275): always construct contains both blocking and non-blocking assignments File: M:/ECE 287/Project/InfiniteRunner/InfiniteRunner.v Line: 275
+Warning (10268): Verilog HDL information at InfiniteRunner.v(1084): always construct contains both blocking and non-blocking assignments File: M:/ECE 287/Project/InfiniteRunner/InfiniteRunner.v Line: 1084
+Info (10281): Verilog HDL Declaration information at InfiniteRunner.v(1415): object "count" differs only in case from object "COUNT" in the same scope File: M:/ECE 287/Project/InfiniteRunner/InfiniteRunner.v Line: 1415
+Info (10281): Verilog HDL Declaration information at InfiniteRunner.v(1413): object "stop" differs only in case from object "STOP" in the same scope File: M:/ECE 287/Project/InfiniteRunner/InfiniteRunner.v Line: 1413
