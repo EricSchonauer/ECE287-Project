@@ -1,0 +1,96 @@
+module vgaTest(clk, rst, hsync, vsync, vga_R, vga_G, vga_B,  vga_blank, vga_clk);
+
+	input wire clk, rst;
+	output hsync, vsync;
+	output reg [7:0] vga_R, vga_G, vga_B;
+	output vga_blank;
+	output vga_clk;
+
+	reg [9:0] pixel_x;
+	reg [9:0] pixel_y;
+
+	reg vga_HS, vga_VS;
+	reg clock25;
+
+
+	
+	wire CounterXmaxed = (pixel_x==799); //799 full width of field including front and back porches and sync
+	wire CounterYmaxed = (pixel_y==525); //525 full length of field including front and back porches and sync
+
+//-----25 MHz clock-----//
+	always @(posedge clk)
+		if(clock25)
+			begin
+				clock25 = 0;
+			end
+		else
+			begin
+				clock25 = 1;
+			end
+//----- end clock -----//
+
+
+//-----Synchronize VGA Output-----//
+	assign vga_clk = clock25;
+	assign vga_blank = vsync & hsync;
+		
+	always @(posedge clock25)
+		if(CounterXmaxed && ~CounterYmaxed)
+			begin
+			pixel_x <= 0;
+			pixel_y <= pixel_y + 1'b1;
+			end 
+		else if (~CounterXmaxed)
+			pixel_x <= pixel_x + 1'b1;
+		else if (CounterXmaxed && CounterYmaxed)
+			begin
+			pixel_y <= 0;
+			pixel_x <= 0;
+			end
+	
+	always @(posedge clock25)
+		begin
+			vga_HS <= (pixel_x <= 96);   // active for 16 clocks
+			vga_VS <= (pixel_y <= 2);   // active for 800 clocks
+		end 
+
+	assign hsync = ~vga_HS;
+	assign vsync = ~vga_VS;
+//----- end synchronization -----//
+
+	drawBox draw(pixel_x, pixel_y, 10'd0, 10'd50, 10'd0, 10'd50, 8'd52, 8'd168, 8'd34, vga_R, vga_B, vga_G);
+
+	always @ (*)
+	begin
+		vga_R = 8'b00000000;
+		vga_B = 8'b00000000;
+		vga_G = 8'b00000000;
+	end
+
+endmodule
+
+
+//------- Draw Box -------//
+
+module drawBox(pixel_x, pixel_y, left_bound, right_bound, upper_bound, lower_bound, in_R, in_G, in_B, out_R, out_B, out_G,);
+input [9:0]left_bound, right_bound, upper_bound, lower_bound, pixel_x, pixel_y;
+input reg [7:0]in_R, in_G, in_B;
+output reg [7:0]out_R, out_G, out_B;
+
+always @ (*)
+begin
+		if (((pixel_x >= left_bound) && (pixel_x <= right_bound)) && ((pixel_y <= upper_bound) && (pixel_y >= lower_bound)))
+		begin
+			out_R = in_R;
+			out_B = in_B;
+			out_G = in_G;
+		end
+end
+
+endmodule
+
+
+
+
+
+
